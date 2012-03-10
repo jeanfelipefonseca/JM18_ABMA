@@ -1754,13 +1754,13 @@ static int init_global_buffers(VideoParameters *p_Vid, InputParameters *p_Inp)
   // allocate and set memory relating to motion estimation
   if (!p_Inp->IntraProfile)
   {  
-    if (p_Inp->SearchMode[0] == UM_HEX || p_Inp->SearchMode[1] == UM_HEX)
+    if (1)
     {
       if ((p_Vid->p_UMHex = (UMHexStruct*)calloc(1, sizeof(UMHexStruct))) == NULL)
         no_mem_exit("init_mv_block: p_Vid->p_UMHex");
       memory_size += UMHEX_get_mem(p_Vid, p_Inp);
     }
-    if (p_Inp->SearchMode[0] == UM_HEX_SIMPLE || p_Inp->SearchMode[1] == UM_HEX_SIMPLE)
+    if (1)
     {
       if ((p_Vid->p_UMHexSMP = (UMHexSMPStruct*)calloc(1, sizeof(UMHexSMPStruct))) == NULL)
         no_mem_exit("init_mv_block: p_Vid->p_UMHexSMP");
@@ -1768,7 +1768,7 @@ static int init_global_buffers(VideoParameters *p_Vid, InputParameters *p_Inp)
       smpUMHEX_init(p_Vid);
       memory_size += smpUMHEX_get_mem(p_Vid);
     }
-    if (p_Inp->SearchMode[0] == EPZS || p_Inp->SearchMode[1] == EPZS)
+    if (1)
     {
       memory_size += EPZSInit(p_Vid);
     }
