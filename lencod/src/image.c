@@ -204,9 +204,9 @@ static void code_a_plane(VideoParameters *p_Vid, InputParameters *p_Inp)
     // Encode one SLice Group
     while (!FmoSliceGroupCompletelyCoded (p_Vid, SliceGroup))
     {
-      // Encode the current slice
+      // Encode the current slice JEAN: encode_one_slice changed to support autoBMAChoice
       if (!p_Vid->mb_aff_frame_flag)
-        NumberOfCodedMBs += encode_one_slice (p_Vid, SliceGroup, NumberOfCodedMBs);
+		NumberOfCodedMBs += encode_one_slice (p_Vid, SliceGroup, NumberOfCodedMBs, AUTO_BMA_YES);
       else
         NumberOfCodedMBs += encode_one_slice_MBAFF (p_Vid, SliceGroup, NumberOfCodedMBs);
 
