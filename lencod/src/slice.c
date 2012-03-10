@@ -428,7 +428,7 @@ static void init_bipred_enabled(VideoParameters *p_Vid)
 *   returns the number of coded MBs in the SLice
 ************************************************************************
 */
-int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMBs)
+int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMBs, int autoBMAChoice)
 {
   InputParameters *p_Inp = p_Vid->p_Inp;
   Boolean end_of_slice = FALSE;
@@ -531,7 +531,12 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
         end_of_slice = TRUE;
       }
       NumberOfCodedMBs++;       // only here we are sure that the coded MB is actually included in the slice
-      next_macroblock (currMB);
+      next_macroblock (currMB);	  
+	  //JEAN: Code to change the BMA algorithm on run-time.
+	  if (autoBMAChoice == AUTO_BMA_YES) {
+		//printf("autoBMAChoice == AUTO_BMA_YES for CurrMB->mb_x = %d e currMB->mb_y = %d\n", currMB->mb_x, currMB->mb_y);
+		currMB->p_Inp->SearchMode[currMB->p_Vid->view_id] = setBMA();
+	  }
     }
     else
     {
