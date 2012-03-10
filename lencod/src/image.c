@@ -1400,6 +1400,7 @@ int encode_one_frame (VideoParameters *p_Vid, InputParameters *p_Inp)
 #else
   if (p_Vid->curr_frm_idx == 0)
 #endif
+    //JEAN:outputs frame report on stdout
     ReportFirstframe(p_Vid, tmp_time);
   else
   {
@@ -1412,7 +1413,8 @@ int encode_one_frame (VideoParameters *p_Vid, InputParameters *p_Inp)
       ReportI(p_Vid, tmp_time);
       break;
     case B_SLICE:
-      ReportB(p_Vid, tmp_time);
+        //JEAN:outputs frame report on stdout
+		ReportB(p_Vid, tmp_time);
       break;
     case SP_SLICE:
       ReportP(p_Vid, tmp_time);
