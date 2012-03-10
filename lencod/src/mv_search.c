@@ -133,14 +133,96 @@ void set_access_method(int *access_method, MotionVector *blk, int min_x, int min
 /*!
  ************************************************************************
  * \brief
+ *    Added by Jean Felipe 05/03/2012
+ *    independently select the BMA regardless of the init_ME_engine method 
+ ************************************************************************
+ */
+
+SearchType setBMA() {
+	static int i = -1;
+	int j = i;
+	//printf("BMA %d\n", i);
+	if (j >= 3	) {
+		i = -1;
+		return (SearchType)j;
+	}
+	i++;
+	return (SearchType)j;
+}
+
+/*!
+ ************************************************************************
+ * \brief
+ *    Added by Jean Felipe 05/03/2012
+ *    independently select the BMA regardless of the init_ME_engine method 
+ ************************************************************************
+ */
+
+void select_BMA(Macroblock *currMB, int auto_BMA_choice) {
+  
+  InputParameters *p_Inp = currMB->p_Inp;
+  VideoParameters *p_Vid = currMB->p_Vid;
+
+ // SearchType searchType;
+
+  //if(auto_BMA_choice == AUTO_BMA_NO)
+	 // searchType = p_Inp->SearchMode[p_Vid->view_id];
+  //else if (auto_BMA_choice == AUTO_BMA_YES) {
+	 // p_Inp->SearchMode[p_Vid->view_id] = setBMA();
+	 // searchType = p_Inp->SearchMode[p_Vid->view_id];
+  //}
+  //printf("searchType = %d\n", searchType);
+  switch (p_Inp->SearchMode[p_Vid->view_id])
+  {
+   case EPZS:
+     EPZS_setup_engine(currMB, p_Inp);
+	 //printf("=======> EPZS selected: p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+     break;
+   case UM_HEX:
+     currMB->IntPelME       = UMHEXIntegerPelBlockMotionSearch;
+     currMB->BiPredME       = UMHEXBipredIntegerPelBlockMotionSearch;
+     currMB->SubPelBiPredME = sub_pel_bipred_motion_estimation;
+     currMB->SubPelME       = UMHEXSubPelBlockME;
+	 //printf("=======> UM_HEX selected: p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+     break;
+   case UM_HEX_SIMPLE:
+     currMB->IntPelME       = smpUMHEXIntegerPelBlockMotionSearch;
+     currMB->BiPredME       = smpUMHEXBipredIntegerPelBlockMotionSearch;
+     currMB->SubPelBiPredME = sub_pel_bipred_motion_estimation;
+     currMB->SubPelME       = smpUMHEXSubPelBlockME;
+	 //printf("=======> UM_HEX_SIMPLE selected: p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+     break;
+   case FULL_SEARCH:
+     currMB->IntPelME       = full_search_motion_estimation;
+     currMB->BiPredME       = full_search_bipred_motion_estimation;
+     currMB->SubPelBiPredME = sub_pel_bipred_motion_estimation;
+     currMB->SubPelME       = sub_pel_motion_estimation;
+	 //printf("=======> FULL_SEARCH selected: p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+     break;
+   case FAST_FULL_SEARCH:
+   default:
+     currMB->IntPelME       = fast_full_search_motion_estimation;
+     currMB->BiPredME       = full_search_bipred_motion_estimation;
+     currMB->SubPelBiPredME = sub_pel_bipred_motion_estimation;
+     currMB->SubPelME       = sub_pel_motion_estimation;
+     currMB->p_SetupFastFullPelSearch = (p_Inp->OnTheFlyFractMCP) ? (SetupFastFullPelSearch_otf):(setup_fast_full_search);
+	 //printf("=======> FAST_FULL_SEARCH selected: p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+     break;
+  }
+}
+
+/*!
+ ************************************************************************
+ * \brief
  *    Initialize ME engine
  ************************************************************************
  */
 void init_ME_engine(Macroblock *currMB)
-{
-  InputParameters *p_Inp = currMB->p_Inp;
-  VideoParameters *p_Vid = currMB->p_Vid;
-  switch (p_Inp->SearchMode[p_Vid->view_id])
+{  
+  //printf("======> init_ME_engine(Macroblock *currMB)\n");
+  select_BMA(currMB, AUTO_BMA_NO);
+  
+  /*switch (p_Inp->SearchMode[p_Vid->view_id])
   {
    case EPZS:
      EPZS_setup_engine(currMB, p_Inp);
@@ -171,7 +253,7 @@ void init_ME_engine(Macroblock *currMB)
      currMB->SubPelME       = sub_pel_motion_estimation;
      currMB->p_SetupFastFullPelSearch = (p_Inp->OnTheFlyFractMCP) ? (SetupFastFullPelSearch_otf):(setup_fast_full_search);
      break;
-  }
+  }*/
 }
 
 /*!
@@ -866,6 +948,10 @@ BlockMotionSearch (Macroblock *currMB,      //!< Current Macroblock
   Slice *currSlice = currMB->p_Slice;
   VideoParameters *p_Vid = currMB->p_Vid;
   InputParameters *p_Inp = currMB->p_Inp;
+  
+  //JEAN: Counting how many times BlockMotionSearch is invoked.
+  //static int counter = 0;
+  //static int prev_currMB_mb_x = -1;
 
   int   i, j;
   distblk   max_value = DISTBLK_MAX;
@@ -884,8 +970,19 @@ BlockMotionSearch (Macroblock *currMB,      //!< Current Macroblock
   MotionVector *mv = &mv_block->mv[list], pred; 
 
   MotionVector **all_mv = &currSlice->all_mv[list][ref][blocktype][block_y];
-
-  distblk *prevSad = (p_Inp->SearchMode[p_Vid->view_id] == EPZS)? currSlice->p_EPZS->distortion[list + currMB->list_offset][blocktype - 1]: NULL;
+    
+  //distblk *prevSad = (p_Inp->SearchMode[p_Vid->view_id] == EPZS)? currSlice->p_EPZS->distortion[list + currMB->list_offset][blocktype - 1]: NULL;
+  distblk *prevSad;
+  //JEAN: 
+  //printf("==============> BlockMotionSearch is invoked %d times\n", ++counter);
+  //JEAN: Changing the BMA. The method select_BMA only when currMB->mb_x increments.
+ // if (prev_currMB_mb_x != currMB->mb_x) {
+	//select_BMA(currMB, AUTO_BMA_YES);
+	//printf("currMB->mb_x = %d\n", currMB->mb_x);
+	//prev_currMB_mb_x = currMB->mb_x;
+ // }	
+  
+  prevSad = (p_Inp->SearchMode[p_Vid->view_id] == EPZS)? currSlice->p_EPZS->distortion[list + currMB->list_offset][blocktype - 1]: NULL;
 
   get_neighbors(currMB, mv_block->block, mb_x, mb_y, bsx);
 
@@ -915,8 +1012,6 @@ BlockMotionSearch (Macroblock *currMB,      //!< Current Macroblock
   {
     currMB->GetMVPredictor (currMB, mv_block->block, &pred, ref, p_Vid->enc_picture->mv_info, list, mb_x, mb_y, bsx, bsy);
   }
-
-
 
   //==================================
   //=====   INTEGER-PEL SEARCH   =====
@@ -955,7 +1050,10 @@ BlockMotionSearch (Macroblock *currMB,      //!< Current Macroblock
 
   // valid search range limits could be precomputed once during the initialization process
   clip_mv_range(p_Vid, 0, mv, Q_PEL);
-
+  // JEAN: Selection of appropriate algorithm!
+  //printf("==================== currMB->pix_x = %d, currMB->pix_y = %d =================================\n", currMB->pix_x, currMB->pix_y);
+  //printf("==================== currMB->block_x = %d, currMB->block_y = %d =================================\n", currMB->block_x, currMB->block_y);
+  //printf("==================== currMB->mb_x = %d, currMB->mb_y = %d =================================\n", currMB->mb_x, currMB->mb_y);
   //--- perform motion search ---
   min_mcost = currMB->IntPelME (currMB, &pred, mv_block, min_mcost, lambda_factor[F_PEL]);
 
@@ -1630,7 +1728,8 @@ void PartitionMotionSearch (Macroblock *currMB,
     mv_block.test8x8 = p_Inp->Transform8x8Mode;
 
     init_mv_block(currMB, &mv_block, (short) blocktype, list, (char) ref, bx, by);
-
+	
+	//JEAN: Testing to choose the right EPZS motion algorithm
     if (p_Inp->SearchMode[p_Vid->view_id] == EPZS)
     {
       if (p_Inp->EPZSSubPelGrid)
@@ -1658,7 +1757,9 @@ void PartitionMotionSearch (Macroblock *currMB,
               get_search_range(&mv_block, p_Inp, ref, blocktype);
 
               //===== LOOP OVER MACROBLOCK partitions        
-              *m_cost = BlockMotionSearch (currMB, &mv_block, bx<<2, by<<2, lambda_factor);     
+              *m_cost = BlockMotionSearch (currMB, &mv_block, bx<<2, by<<2, lambda_factor);
+			  //JEAN: Printing motion cost
+			  //printf("m_cost = %d\n",*m_cost);
             }
             //--- set motion vectors and reference frame ---            
             set_me_parameters(motion, &currSlice->all_mv[list][ref][blocktype][by][bx], list, (char) ref, step_h, step_v, pic_block_y, pic_block_x);
