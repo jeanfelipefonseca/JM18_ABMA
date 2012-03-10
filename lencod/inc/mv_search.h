@@ -40,6 +40,9 @@ extern void  Get_Direct_MV_Spatial_Normal (Macroblock *currMB);
 extern void  Get_Direct_MV_Temporal       (Macroblock *currMB);
 
 extern void  FindSkipModeMotionVector     (Macroblock *currMB);
+//Added by Jean Felipe
+extern void select_BMA(Macroblock *currMB, int auto_BMA_choice);
+SearchType setBMA();
 
 extern void init_ME_engine    (Macroblock *currMB);
 extern distblk  BlockMotionSearch (Macroblock *currMB, MEBlock *mv_block, int,int, int*);
