@@ -342,6 +342,9 @@ enum {
 #define NUM_ONE_CTX    5
 #define NUM_ABS_CTX    5
 
+#define AUTO_BMA_NO 1
+#define AUTO_BMA_YES 0
+
 enum // JLT : on-the-fly levels/modes
 {
   OTF_L0 = 0, // Disable, interpolate & store all positions
