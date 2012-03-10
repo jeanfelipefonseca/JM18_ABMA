@@ -34,7 +34,7 @@ static const int QP2QUANT[40]=
 };
 
 
-extern int  encode_one_slice       ( VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMBs );
+extern int  encode_one_slice       ( VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMBs, int autoBMAChoice );
 extern int  encode_one_slice_MBAFF ( VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMBs );
 extern void init_slice             ( VideoParameters *p_Vid, Slice **currSlice, int start_mb_addr );
 extern void init_slice_lite        ( VideoParameters *p_Vid, Slice **currSlice, int start_mb_addr );
