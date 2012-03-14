@@ -55,5 +55,9 @@ extern void OutputImage(char *pcPrefix, int iFrameNo, int iLevel, imgpel **pImg,
 extern void copy_params(VideoParameters *p_Vid, StorablePicture *enc_picture, seq_parameter_set_rbsp_t *active_sps);
 extern void OtfCompatibility_copyWithPadding ( imgpel **dstImg, imgpel **srcImg, int size_x, int size_y, int padding_x, int padding_y ); // JLT
 
+//JEAN: Method to evaluate which is the best BMA regarding current Distortion Parameters
+extern SearchType evaluateDistortionOfBMA(InputParameters* p_Inp, VideoParameters* p_Vid);
+extern SearchType ChooseBMA(SearchType CurrBMA, float currDelta, float prevDelta);
+
 #endif
 

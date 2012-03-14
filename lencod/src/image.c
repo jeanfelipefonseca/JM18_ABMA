@@ -1434,6 +1434,12 @@ int encode_one_frame (VideoParameters *p_Vid, InputParameters *p_Inp)
   }
   // Flush output statistics
   fflush(stdout);
+  //JEAN: Code to change the BMA algorithm on run-time. per-frame
+  //if (autoBMAChoice != AUTO_BMA_YES) {
+    //printf("autoBMAChoice == AUTO_BMA_YES for CurrMB->mb_x = %d e currMB->mb_y = %d\n", currMB->mb_x, currMB->mb_y);
+	  p_Inp->SearchMode[p_Vid->view_id] = evaluateDistortionOfBMA(p_Inp ,p_Vid);
+	  printf("=====> p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+  //}
 
   //Rate control
   if(p_Inp->RCEnable)
@@ -1446,7 +1452,68 @@ int encode_one_frame (VideoParameters *p_Vid, InputParameters *p_Inp)
 
   return 1;
 }
+//JEAN:  Method to evaluate which is the best BMA regarding current Distortion Parameters
+/*!
+ ************************************************************************
+ * \brief
+ *    This function write out a picture
+ * \return
+ *    0 if OK,                                                         \n
+ *    1 in case of error
+ *
+ ************************************************************************
+ */
+SearchType evaluateDistortionOfBMA(InputParameters* p_Inp, VideoParameters* p_Vid){
+	float currDistortion = 0;
+	static float prevDistortion, prevDeltaDistorcion, deltaDistortion;
+	printf("prevDistortion = %f\n", prevDistortion);
 
+	if (prevDistortion != 0) {
+		currDistortion = p_Vid->p_Dist->metric[PSNR].value[0];
+		prevDeltaDistorcion = deltaDistortion;
+		deltaDistortion = prevDistortion - currDistortion;
+		prevDistortion = currDistortion;
+		printf("=====> currDistortion = %f, prevDistortion = %f, deltaDistortion = %f\n", currDistortion, prevDistortion, deltaDistortion);
+		if (deltaDistortion > 0) {
+			p_Inp->SearchMode[p_Vid->view_id] = ChooseBMA(p_Inp->SearchMode[p_Vid->view_id], deltaDistortion, prevDeltaDistorcion);			
+			printf("======> deltaDistortion > 0\n");
+		}
+	} else
+		prevDistortion = p_Vid->p_Dist->metric[PSNR].value[0];
+	
+	return p_Inp->SearchMode[p_Vid->view_id];
+}
+
+/*!
+ ************************************************************************
+ * \brief
+ *    This function returns the selected BMA
+ * \return
+ *    SearchMode                                                         \n
+ *
+ ************************************************************************
+ */
+SearchType ChooseBMA(SearchType CurrBMA, float currDelta, float prevDelta) {
+	float factor;
+	int multiplier = 2;
+
+	factor = (prevDelta - currDelta)/currDelta;
+	printf("=====> factor = %f\n", factor);
+    if (factor <= 0)
+		return CurrBMA;
+	else if (factor > 0 && factor < 0.3 * multiplier)
+		return EPZS;
+	else if (factor >= (0.3 * multiplier) && factor < (0.7 * multiplier))
+		return UM_HEX_SIMPLE;
+	else if (factor >= (0.7 * multiplier) && factor < (1.0 * multiplier))
+		return UM_HEX;
+	else if (factor >= (1.0 * multiplier) && factor < (1.5 * multiplier))
+		return FAST_FULL_SEARCH;
+	else if (factor >= (1.5 * multiplier))
+		return FULL_SEARCH;
+
+	return CurrBMA;
+}
 
 /*!
  ************************************************************************

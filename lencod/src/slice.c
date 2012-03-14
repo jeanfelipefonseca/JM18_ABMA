@@ -525,15 +525,15 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
     {
       p_Vid->SumFrameQP += currMB->qp;
       CurrentMbAddr = FmoGetNextMBNr (p_Vid, CurrentMbAddr);
-      if (CurrentMbAddr == -1)   // end of slice
+      if (CurrentMbAddr == -1)   // end of slices
       {
         // printf ("FMO End of Slice Group detected, current MBs %d, force end of slice\n", NumberOfCodedMBs+1);
         end_of_slice = TRUE;
       }
       NumberOfCodedMBs++;       // only here we are sure that the coded MB is actually included in the slice
       next_macroblock (currMB);	  
-	  //JEAN: Code to change the BMA algorithm on run-time.
-	  if (autoBMAChoice == AUTO_BMA_YES) {
+	  //JEAN: Code to change the BMA algorithm on run-time. per-slice
+	  if (autoBMAChoice != AUTO_BMA_YES) {
 		//printf("autoBMAChoice == AUTO_BMA_YES for CurrMB->mb_x = %d e currMB->mb_y = %d\n", currMB->mb_x, currMB->mb_y);
 		currMB->p_Inp->SearchMode[currMB->p_Vid->view_id] = setBMA();
 	  }
