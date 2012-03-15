@@ -162,9 +162,7 @@ void select_BMA(Macroblock *currMB, int auto_BMA_choice) {
   
   InputParameters *p_Inp = currMB->p_Inp;
   VideoParameters *p_Vid = currMB->p_Vid;
-
- // SearchType searchType;
-
+  // SearchType searchType;
   //if(auto_BMA_choice == AUTO_BMA_NO)
 	 // searchType = p_Inp->SearchMode[p_Vid->view_id];
   //else if (auto_BMA_choice == AUTO_BMA_YES) {
