@@ -132,6 +132,12 @@ typedef enum
   EPZS             =  3
 } SearchType;
 
+//JEAN: enum to support the granularity level of the block matching algorithm
+typedef enum {
+	FRAME_LEVEL	= 1,
+	SLICE_LEVEL = 2,
+	MACRO_LEVEL = 3
+} GranularityLevel;
 
 typedef enum
 {
