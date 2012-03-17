@@ -978,6 +978,9 @@ typedef struct inp_par
   int silent;
   int intra_profile_deblocking;               //!< Loop filter usage determined by flags and parameters in bitstream 
 
+  //JEAN: Enum for granularity level for the execution of bma
+  GranularityLevel granLevel;
+
   // Input/output sequence format related variables
   FrameFormat source;                   //!< source related information
   FrameFormat output;                   //!< output related information
