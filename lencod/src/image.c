@@ -1183,6 +1183,8 @@ int encode_one_frame (VideoParameters *p_Vid, InputParameters *p_Inp)
   TIME_T start_time;
   TIME_T end_time;
   int64  tmp_time;
+  //JEAN: Temporary hardcoded initialization for autoBMAChoice
+  int autoBMAChoice = AUTO_BMA_YES;
 
   p_Vid->me_time = 0;
   p_Vid->rd_pass = 0;
@@ -1434,12 +1436,17 @@ int encode_one_frame (VideoParameters *p_Vid, InputParameters *p_Inp)
   }
   // Flush output statistics
   fflush(stdout);
+  
   //JEAN: Code to change the BMA algorithm on run-time. per-frame
-  //if (autoBMAChoice != AUTO_BMA_YES) {
-    //printf("autoBMAChoice == AUTO_BMA_YES for CurrMB->mb_x = %d e currMB->mb_y = %d\n", currMB->mb_x, currMB->mb_y);
-	  p_Inp->SearchMode[p_Vid->view_id] = evaluateDistortionOfBMA(p_Inp ,p_Vid);
-	  printf("=====> p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
-  //}
+  p_Inp->granLevel = SLICE_LEVEL;
+
+  if (p_Inp->granLevel == FRAME_LEVEL) {
+	  if (autoBMAChoice == AUTO_BMA_YES) {
+		p_Inp->SearchMode[p_Vid->view_id] = evaluateDistortionOfBMA(p_Inp ,p_Vid);
+		printf("=====> p_Inp->SearchMode[p_Vid->view_id] = %d\n", p_Inp->SearchMode[p_Vid->view_id]);
+		printf("p_Inp->granLevel == FRAME_LEVEL\n");
+	  }
+  }
 
   //Rate control
   if(p_Inp->RCEnable)
@@ -2649,7 +2656,7 @@ static void ReportVerboseSSIM(VideoParameters *p_Vid, char *pic_type, int cur_bi
     p_Vid->fld_flag ? "FLD" : "FRM", p_Vid->intras, direct_mode,
     p_Vid->num_ref_idx_l0_active, p_Vid->num_ref_idx_l1_active,p_Vid->rd_pass, p_Vid->nal_reference_idc);
   }
-}
+} 
 
 static void ReportVerboseNVBSSIM(VideoParameters *p_Vid, char *pic_type, int cur_bits, int nvb_bits, int wp_method, int lambda, DistMetric *mPSNR, DistMetric *mSSIM,int tmp_time, int direct_mode)
 {
