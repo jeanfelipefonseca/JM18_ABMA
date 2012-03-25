@@ -67,6 +67,8 @@ static const short block_size[8][2] =
   {4, 4}
 };
 
+extern void getCurrMacroBlockDistorcion(Slice *currSlice, Macroblock *currMB);
+
 extern void  next_macroblock  (Macroblock* currMB);
 extern void  start_macroblock (Slice *currSlice, Macroblock** currMB, int mb_addr, Boolean mb_field);
 extern void  reset_macroblock (Macroblock *currMB);
