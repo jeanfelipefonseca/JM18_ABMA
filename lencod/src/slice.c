@@ -439,6 +439,7 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
   int CurrentMbAddr;
   StatParameters *cur_stats = &p_Vid->enc_picture->stats;
   Slice *currSlice = NULL;  
+  double sliceDistorcion = 0;
 
   if( (p_Inp->separate_colour_plane_flag != 0) )
   {
@@ -483,6 +484,17 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
   if(currSlice->UseRDOQuant == 1 && currSlice->RDOQ_QP_Num > 1)
     get_dQP_table(currSlice);
 
+  //JEAN: Code to change the BMA algorithm on run-time. per-slice
+  if (p_Inp->granLevel == SLICE_LEVEL)
+  {
+	if (autoBMAChoice == AUTO_BMA_YES) 
+	{
+		//printf("autoBMAChoice == AUTO_BMA_YES and p_Inp->granLevel == SLICE_LEVEL\n");
+		currSlice->p_Inp->SearchMode[currSlice->p_Vid->view_id] = evaluateDistortionOfBMA(currSlice->p_Inp, currSlice->p_Vid);
+		printf("========> BMA = %d", currSlice->p_Inp->SearchMode[currSlice->p_Vid->view_id]);
+	}
+  }
+
   while (end_of_slice == FALSE) // loop over macroblocks
   {
     Boolean recode_macroblock = FALSE;
@@ -498,9 +510,15 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
     else
       currSlice->rddata = &currSlice->rddata_top_frame_mb;   // store data in top frame MB
 
-    start_macroblock (currSlice,  &currMB, CurrentMbAddr, FALSE);
-
-
+	start_macroblock (currSlice,  &currMB, CurrentMbAddr, FALSE);
+	if (p_Inp->granLevel == MACRO_LEVEL)
+	{
+		if (autoBMAChoice == AUTO_BMA_YES) 
+		{
+			printf("autoBMAChoice == AUTO_BMA_YES and p_Inp->granLevel == MACRO_LEVEL\n");
+			currSlice->p_Inp->SearchMode[currSlice->p_Vid->view_id] = evaluateDistortionOfBMA(currMB->p_Inp, currMB->p_Vid);
+		}
+	}
     if(currSlice->UseRDOQuant)
     {
       trellis_coding(currMB);   
@@ -531,12 +549,7 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
         end_of_slice = TRUE;
       }
       NumberOfCodedMBs++;       // only here we are sure that the coded MB is actually included in the slice
-      next_macroblock (currMB);	  
-	  //JEAN: Code to change the BMA algorithm on run-time. per-slice
-	  if (autoBMAChoice != AUTO_BMA_YES) {
-		//printf("autoBMAChoice == AUTO_BMA_YES for CurrMB->mb_x = %d e currMB->mb_y = %d\n", currMB->mb_x, currMB->mb_y);
-		currMB->p_Inp->SearchMode[currMB->p_Vid->view_id] = setBMA();
-	  }
+      next_macroblock (currMB);	
     }
     else
     {
@@ -550,8 +563,10 @@ int encode_one_slice (VideoParameters *p_Vid, int SliceGroupId, int TotalCodedMB
         error (errortext, 300);
       }
     }
+	sliceDistorcion += currSlice->getDistortion(currMB);
   }
-
+  //sliceDistorcion = sliceDistorcion / NumberOfCodedMBs;
+  printf("=====> sliceDistorcion, NumberOfCodedMBs: %f, %d\n", sliceDistorcion/currSlice->num_mb, currSlice->num_mb);
 
   if ((p_Inp->WPIterMC) && (p_Vid->frameOffsetAvail == 0) && p_Vid->nal_reference_idc)
   {
