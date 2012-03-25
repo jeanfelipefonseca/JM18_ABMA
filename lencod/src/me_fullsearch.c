@@ -64,6 +64,8 @@ full_search_motion_estimation (Macroblock   *currMB ,       // <--  current Macr
   pred.mv_x        = mv_block->pos_x_padded + pred_mv->mv_x;       // predicted position x (in sub-pel units)
   pred.mv_y        = mv_block->pos_y_padded + pred_mv->mv_y;       // predicted position y (in sub-pel units)
   
+  //JEAN: output to inform the chosen bma.
+  //printf("Block Matching Algorithm =======> Full Search\n");
 
   //===== loop over all search positions =====
   for (pos=0; pos<max_pos; pos++)

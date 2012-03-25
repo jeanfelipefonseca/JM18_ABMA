@@ -271,6 +271,7 @@ UMHEXIntegerPelBlockMotionSearch  (Macroblock *currMB,     // <--  current Macro
   //////allocate memory for search state//////////////////////////
   memset(p_UMHex->McostState[0],0,(2*p_Inp->search_range[p_Vid->view_id]+1)*(2*p_Inp->search_range[p_Vid->view_id]+1));
 
+  //printf("Block Matching Algorithm =======> UMHEX\n");
 
   //check the center median predictor
 

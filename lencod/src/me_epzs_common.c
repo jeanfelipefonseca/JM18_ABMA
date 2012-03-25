@@ -152,6 +152,8 @@ void EPZS_setup_engine(Macroblock *currMB, InputParameters *p_Inp)
 {
   currMB->IntPelME = (p_Inp->EPZSSubPelGrid) ? EPZS_integer_motion_estimation : EPZS_motion_estimation;
   currMB->BiPredME = (p_Inp->EPZSSubPelGrid) ? EPZS_integer_bipred_motion_estimation : EPZS_bipred_motion_estimation;
+  //JEAN: output to inform the chosen bma.
+  //printf("Block Matching Algorithm =======> EPZS\n");
   if (p_Inp->EPZSSubPelME == 1)
     currMB->SubPelME = EPZS_sub_pel_motion_estimation;
   else if (p_Inp->EPZSSubPelME == 2)
@@ -164,6 +166,7 @@ void EPZS_setup_engine(Macroblock *currMB, InputParameters *p_Inp)
     currMB->SubPelBiPredME = full_sub_pel_bipred_motion_estimation;
   else
     currMB->SubPelBiPredME = sub_pel_bipred_motion_estimation;
+
 }
 
 /*!

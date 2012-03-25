@@ -637,6 +637,9 @@ fast_full_search_motion_estimation (Macroblock   *currMB,        // <--  current
   MotionVector cand = {0, 0}, *offset = &p_Vid->p_ffast_me->search_center[list][ref];
   int max_mvd = p_Vid->max_mvd-1;
 
+  //JEAN: output to inform the chosen bma.
+  //printf("Block Matching Algorithm =======> Fast Full Search\n");
+
   block_index = (mv_block->block_y << 2) + (mv_block->block_x); // block index for indexing SAD array
   block_sad   = p_me_ffast->BlockSAD[list][ref][mv_block->blocktype][block_index];         // pointer to SAD array
   

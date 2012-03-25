@@ -181,7 +181,8 @@ smpUMHEXIntegerPelBlockMotionSearch (Macroblock *currMB,      // <--  current Ma
 
   cand = center;
   mcost = mv_cost (p_Vid, lambda_factor, &cand, &pred);
-
+  //JEAN: output to inform the chosen bma.
+  //printf("Block Matching Algorithm =======> UMHEX Simple\n");
   mcost += mv_block->computePredFPel(ref_picture, mv_block, min_mcost - mcost, &cand);
 
   if (mcost < min_mcost)
