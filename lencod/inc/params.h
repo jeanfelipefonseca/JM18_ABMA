@@ -25,6 +25,9 @@ struct inp_par_enc
   int ProfileIDC;                       //!< value of syntax element profile_idc
   int LevelIDC;                         //!< value of syntax element level_idc
   int IntraProfile;                     //!< Enable Intra profiles
+
+  //JEAN:
+  GranularityLevel granLevel;
   
   int no_frames;                        //!< number of frames to be encoded
   int qp[NUM_SLICE_TYPES];              //!< QP values for all slice types
