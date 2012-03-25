@@ -48,6 +48,8 @@
 #include "rdopt.h"
 #include "transform.h"
 
+#include "img_dist_snr.h"
+
 
 #if TRACE
 #define TRACE_SE(trace,str)  snprintf(trace,TRACESTRING_SIZE,str)
@@ -60,6 +62,27 @@ static int  slice_too_big                (Slice *currSlice, int rlc_bits);
 static int  write_chroma_intra_pred_mode (Macroblock* currMB);
 static int  write_chroma_coeff           (Macroblock* currMB);
 static int  write_CBP_and_Dquant         (Macroblock* currMB);
+
+ /*!
+ ************************************************************************
+ * \brief
+ *    computes macroblock distorcion
+ *
+ * 
+ ************************************************************************
+ */
+
+void getCurrMacroBlockDistorcion(Slice *currSlice, Macroblock *currMB) {
+  
+  VideoParameters *p_Vid = currSlice->p_Vid;
+  InputParameters *p_Inp = currSlice->p_Inp;
+
+  //find_snr(p_Vid, &p_Vid->imgREF, 
+
+
+
+	
+}
 
  /*!
  ************************************************************************
