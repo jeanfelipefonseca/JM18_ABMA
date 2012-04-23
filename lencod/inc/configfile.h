@@ -95,7 +95,7 @@ Mapping Map[] = {
     {"InputFile3",               &cfgparams.input_file3.fname,            1,   0.0,                       0,  0.0,              0.0,             FILE_NAME_SIZE, },
     {"SEIVUI32Pulldown",         &cfgparams.SEIVUI32Pulldown,             0,   0.0,                       1,  0.0,              5.0,                             },
 
-    {"ProcessInput",             &cfgparams.ProcessInput,                 0,   0.0,                       1,  0.0,              4.0,                             },    
+    {"ProcessInput",             &cfgparams.ProcessInput,                 0,   0.0,                       1,  0.0,              5.0,                             },    
     {"DispPQPOffset",            &cfgparams.DispPQPOffset,                0,   0.0,                       0,-51.0,             51.0,                             },
     {"NumberBFrames",            &cfgparams.NumberBFrames,                0,   0.0,                       2,  0.0,              0.0,                             },
     {"PReplaceBSlice",           &cfgparams.PReplaceBSlice,               0,   0.0,                       1,  0.0,              1.0,                             },
